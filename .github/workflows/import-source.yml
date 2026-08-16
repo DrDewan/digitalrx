@@ -1,0 +1,32 @@
+name: Import Digital Rx source
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.bootstrap/source.tar.gz'
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Unpack source
+        run: tar -xzf .bootstrap/source.tar.gz -C .
+
+      - name: Remove one-time bootstrap files
+        run: rm -rf .bootstrap .github/workflows/import-source.yml
+
+      - name: Commit imported source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Import Digital Rx source"
+          git push origin HEAD:main
