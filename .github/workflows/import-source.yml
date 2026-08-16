@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - '.bootstrap/source.tar.gz'
+      - '.bootstrap/chunk_00'
+      - '.bootstrap/b64_01_0'
 
 permissions:
   contents: write
@@ -16,8 +17,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Unpack source
-        run: tar -xzf .bootstrap/source.tar.gz -C .
+      - name: Reconstruct and unpack source
+        shell: bash
+        run: |
+          cat .bootstrap/chunk_00 > /tmp/source.tar.gz
+          for p in 01 02 03; do
+            cat .bootstrap/b64_${p}_* | base64 -d >> /tmp/source.tar.gz
+          done
+          cat .bootstrap/chunk_{04..18} >> /tmp/source.tar.gz
+          test "$(wc -c < /tmp/source.tar.gz)" -eq 73351
+          tar -tzf /tmp/source.tar.gz >/dev/null
+          tar -xzf /tmp/source.tar.gz -C .
 
       - name: Remove one-time bootstrap files
         run: rm -rf .bootstrap .github/workflows/import-source.yml
