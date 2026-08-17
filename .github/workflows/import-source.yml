@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - '.bootstrap/chunk_00'
-      - '.bootstrap/b64_01_0'
+      - '.github/workflows/import-source.yml'
+      - 'digital-rx.zip'
 
 permissions:
   contents: write
@@ -17,20 +17,29 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Reconstruct and unpack source
+      - name: Unpack uploaded Digital Rx source
         shell: bash
         run: |
-          cat .bootstrap/chunk_00 > /tmp/source.tar.gz
-          for p in 01 02 03; do
-            cat .bootstrap/b64_${p}_* | base64 -d >> /tmp/source.tar.gz
-          done
-          cat .bootstrap/chunk_{04..18} >> /tmp/source.tar.gz
-          test "$(wc -c < /tmp/source.tar.gz)" -eq 73351
-          tar -tzf /tmp/source.tar.gz >/dev/null
-          tar -xzf /tmp/source.tar.gz -C .
+          rm -rf /tmp/digitalrx-import
+          mkdir -p /tmp/digitalrx-import
+          unzip -q digital-rx.zip -d /tmp/digitalrx-import
 
-      - name: Remove one-time bootstrap files
-        run: rm -rf .bootstrap .github/workflows/import-source.yml
+          if [ -f /tmp/digitalrx-import/package.json ]; then
+            SRC=/tmp/digitalrx-import
+          else
+            SRC=$(find /tmp/digitalrx-import -mindepth 1 -maxdepth 2 -type f -name package.json -print -quit | xargs -r dirname)
+          fi
+
+          test -n "$SRC"
+          test -f "$SRC/package.json"
+
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/import-source.yml' \
+            "$SRC/" ./
+
+          rm -rf .bootstrap
+          rm -f digital-rx.zip
 
       - name: Commit imported source
         run: |
