@@ -11,8 +11,8 @@
     "test": "tsx tests/overlay.test.ts"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.45.4",
+    "@supabase/ssr": "0.5.2",
+    "@supabase/supabase-js": "2.45.4",
     "next": "^15.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
