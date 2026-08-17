@@ -40,16 +40,17 @@ export async function upsertPatientFromDraft(
     const { supabase, user } = await requireUser();
 
     const sex = sexOrNull(patient.sex);
-    const optional: Record<string, string> = {
+    const optional = {
       age: patient.age.trim(),
       phone: patient.phone.trim(),
       mrn: patient.mrn.trim(),
       weight: patient.weight.trim(),
     };
-    const changes: Record<string, string | null> = { name };
-    for (const [key, value] of Object.entries(optional)) {
-      if (value) changes[key] = value;
-    }
+    const changes: Partial<PatientRow> = { name };
+    if (optional.age) changes.age = optional.age;
+    if (optional.phone) changes.phone = optional.phone;
+    if (optional.mrn) changes.mrn = optional.mrn;
+    if (optional.weight) changes.weight = optional.weight;
     if (sex) changes.sex = sex;
 
     let targetId = patient.patientId;
