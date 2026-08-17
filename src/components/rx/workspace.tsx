@@ -324,21 +324,24 @@ export function Workspace({
         )}
       </div>
 
-      {/* Body */}
-      <div className="grid flex-1 gap-3 p-3 xl:grid-cols-2">
-        <div className="space-y-3">
-          <ComplaintsPanel language={language} />
-          <HistoryPanel language={language} />
-          <ExaminationPanel language={language} />
-          <InvestigationsPanel language={language} />
+      {/* Clinical workflow: pad | consultation | examination */}
+      <div className="grid flex-1 gap-3 p-3 xl:grid-cols-3 xl:items-start">
+        <div className="space-y-3 xl:order-1">
+          <OverlayPanel language={language} />
         </div>
 
-        <div className="space-y-3">
-          <MedicinesPanel language={language} />
+        <div className="space-y-3 xl:order-2">
+          <ComplaintsPanel language={language} />
+          <HistoryPanel language={language} />
           <DiagnosisPanel language={language} />
+          <MedicinesPanel language={language} />
           <AdvicePanel language={language} />
           <PlanNotesPanel language={language} />
-          <OverlayPanel language={language} />
+        </div>
+
+        <div className="space-y-3 xl:order-3">
+          <ExaminationPanel language={language} />
+          <InvestigationsPanel language={language} />
         </div>
       </div>
 

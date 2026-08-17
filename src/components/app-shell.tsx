@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/lib/actions/auth";
@@ -40,7 +41,20 @@ export function AppShell({
   language: Language;
 }) {
   const pathname = usePathname();
+  const [navCollapsed, setNavCollapsed] = useState(false);
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
+
+  useEffect(() => {
+    setNavCollapsed(window.localStorage.getItem("digital-rx:nav-collapsed") === "1");
+  }, []);
+
+  const toggleNav = () => {
+    setNavCollapsed((current) => {
+      const next = !current;
+      window.localStorage.setItem("digital-rx:nav-collapsed", next ? "1" : "0");
+      return next;
+    });
+  };
 
   return (
     <div className="flex min-h-dvh flex-col bg-slate-100">
@@ -75,9 +89,21 @@ export function AppShell({
         {/* Wide screens: a labelled rail. Narrow: a bottom-safe horizontal bar. */}
         <nav
           aria-label="Sections"
-          className="no-print sticky top-14 z-20 flex shrink-0 gap-1 overflow-x-auto border-b border-slate-200 bg-white px-2 py-1.5
-                     lg:sticky lg:top-14 lg:h-[calc(100dvh-3.5rem)] lg:w-52 lg:flex-col lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-2 lg:py-3"
+          className={`no-print sticky top-14 z-20 flex shrink-0 gap-1 overflow-x-auto border-b border-slate-200 bg-white px-2 py-1.5 transition-[width] duration-200
+                     lg:sticky lg:top-14 lg:h-[calc(100dvh-3.5rem)] lg:flex-col lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-2 lg:py-3 ${
+                       navCollapsed ? "lg:w-16" : "lg:w-52"
+                     }`}
         >
+          <button
+            type="button"
+            onClick={toggleNav}
+            className="mb-1 hidden h-9 items-center justify-center rounded-md border border-slate-200 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 lg:flex"
+            aria-label={navCollapsed ? "Expand navigation" : "Collapse navigation"}
+            title={navCollapsed ? "Expand navigation" : "Collapse navigation"}
+          >
+            {navCollapsed ? "›" : "‹"}
+          </button>
+
           {NAV.map(({ href, labelKey, Icon }) => {
             const active = pathname === href || pathname.startsWith(`${href}/`);
             return (
@@ -92,7 +118,7 @@ export function AppShell({
                 }`}
               >
                 <Icon />
-                <span>{t(labelKey)}</span>
+                <span className={navCollapsed ? "lg:hidden" : ""}>{t(labelKey)}</span>
               </Link>
             );
           })}

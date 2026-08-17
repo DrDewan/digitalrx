@@ -24,7 +24,7 @@ export function MedicinesPanel({ language }: { language: Language }) {
 
   return (
     <Panel
-      title={t("medicines")}
+      title={language === "bn" ? "চিকিৎসা" : "Treatment"}
       actions={
         <button type="button" className="btn-secondary btn-sm" onClick={() => addMedicine()}>
           <IconPlus />
