@@ -1,0 +1,510 @@
+diff -ruN digital-rx-orig/digital-rx/src/lib/demo.ts digital-rx-demo-clean/src/lib/demo.ts
+--- digital-rx-orig/digital-rx/src/lib/demo.ts	1970-01-01 00:00:00.000000000 +0000
++++ digital-rx-demo-clean/src/lib/demo.ts	2026-08-17 03:57:49.609199004 +0000
+@@ -0,0 +1,448 @@
++import type { Json, MedicineSearchRow, PatientRow, PrescriptionRow, ProfileRow, TemplateRow } from "@/lib/db/types";
++import { DEFAULT_OVERLAY_BOXES, DRAFT_VERSION, emptyVitals, type RxDraft } from "@/lib/rx/types";
++
++/**
++ * Demo mode turns on automatically when either public Supabase credential is
++ * missing. NEXT_PUBLIC_DEMO_MODE=true can also force it on explicitly.
++ */
++export const DEMO_MODE =
++  process.env.NEXT_PUBLIC_DEMO_MODE === "true" ||
++  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
++  !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
++
++const USER_ID = "demo-user";
++const NOW = "2026-08-17T03:30:00.000Z";
++
++const profile: ProfileRow = {
++  id: USER_ID,
++  doctor_name: "Dr. A. Rahman",
++  qualifications: "MBBS, FCPS (Medicine)",
++  bmdc_no: "A-12345",
++  clinic_name: "Digital Rx Demo Clinic",
++  clinic_address: "Dhaka, Bangladesh",
++  clinic_phone: "+880 1XXX-XXXXXX",
++  clinic_email: "demo@digitalrx.local",
++  default_language: "en",
++  overlay_boxes: DEFAULT_OVERLAY_BOXES as unknown as Json,
++  overlay_font_max: 11,
++  overlay_font_min: 9,
++  rx_counter: 1042,
++  created_at: NOW,
++  updated_at: NOW,
++};
++
++const patients: PatientRow[] = [
++  {
++    id: "demo-patient-1",
++    user_id: USER_ID,
++    name: "Rahim Ahmed",
++    age: "52 years",
++    sex: "Male",
++    phone: "01700-000001",
++    mrn: "DRX-1001",
++    weight: "78 kg",
++    address: "Uttara, Dhaka",
++    notes: "Hypertension and type 2 diabetes. Demo record only.",
++    created_at: "2026-07-12T09:00:00.000Z",
++    updated_at: NOW,
++  },
++  {
++    id: "demo-patient-2",
++    user_id: USER_ID,
++    name: "Nadia Karim",
++    age: "34 years",
++    sex: "Female",
++    phone: "01700-000002",
++    mrn: "DRX-1002",
++    weight: "62 kg",
++    address: "Bashundhara, Dhaka",
++    notes: "Recurrent migraine. Demo record only.",
++    created_at: "2026-07-28T10:30:00.000Z",
++    updated_at: NOW,
++  },
++  {
++    id: "demo-patient-3",
++    user_id: USER_ID,
++    name: "Samiul Hasan",
++    age: "27 years",
++    sex: "Male",
++    phone: "01700-000003",
++    mrn: "DRX-1003",
++    weight: "70 kg",
++    address: "Dhanmondi, Dhaka",
++    notes: "Allergic rhinitis. Demo record only.",
++    created_at: "2026-08-02T12:15:00.000Z",
++    updated_at: NOW,
++  },
++];
++
++const demoDraft: RxDraft = {
++  version: DRAFT_VERSION,
++  language: "en",
++  visitDate: "2026-08-17",
++  patient: {
++    patientId: "demo-patient-1",
++    name: "Rahim Ahmed",
++    age: "52 years",
++    sex: "Male",
++    mrn: "DRX-1001",
++    weight: "78 kg",
++    phone: "01700-000001",
++  },
++  chiefComplaints: { selected: [], final: "Headache for 3 days\nOccasional dizziness" },
++  history: {
++    comorbidities: "Hypertension, Type 2 diabetes mellitus",
++    pastMedical: "No previous stroke or ischaemic heart disease",
++    treatment: "On regular antihypertensive and oral antidiabetic treatment",
++    drug: "No known drug allergy",
++  },
++  examination: {
++    findings: "Conscious, oriented, no focal neurological deficit",
++    vitals: {
++      ...emptyVitals(),
++      bp: { show: true, value: "148/92 mmHg" },
++      pulse: { show: true, value: "78/min" },
++      spo2: { show: true, value: "98%" },
++      weight: { show: true, value: "78 kg" },
++    },
++    anatomy: [],
++  },
++  investigations: ["CBC", "Serum creatinine", "HbA1c", "Fasting lipid profile"],
++  diagnosis: "Hypertension — suboptimal control\nType 2 diabetes mellitus",
++  medicines: [
++    {
++      id: "demo-line-1",
++      name: "Amlodipine",
++      strength: "5 mg",
++      dose: "1 tablet",
++      frequency: "Once daily",
++      duration: "30 days",
++      instructions: "At night",
++    },
++    {
++      id: "demo-line-2",
++      name: "Metformin",
++      strength: "500 mg",
++      dose: "1 tablet",
++      frequency: "Twice daily",
++      duration: "30 days",
++      instructions: "After meals",
++    },
++  ],
++  advice: [
++    { id: "demo-low-salt", en: "Reduce dietary salt.", bn: "খাবারে লবণ কমান।" },
++    { id: "demo-exercise", en: "Regular walking as tolerated.", bn: "সহনীয় মাত্রায় নিয়মিত হাঁটুন।" },
++  ],
++  plan: "Review blood pressure log and investigation results at follow-up.",
++  notes: "Frontend demo. No patient data is stored.",
++  followUp: { date: "2026-08-31", note: "Follow up in 2 weeks" },
++  overlay: {
++    auto: { disease: true, treatment: true, diagnosis: true, advice: true },
++    manual: { disease: "", treatment: "", diagnosis: "", advice: "" },
++  },
++};
++
++const migraineDraft: RxDraft = {
++  ...demoDraft,
++  visitDate: "2026-08-10",
++  patient: {
++    patientId: "demo-patient-2",
++    name: "Nadia Karim",
++    age: "34 years",
++    sex: "Female",
++    mrn: "DRX-1002",
++    weight: "62 kg",
++    phone: "01700-000002",
++  },
++  chiefComplaints: { selected: [], final: "Unilateral throbbing headache with nausea" },
++  history: {
++    comorbidities: "None known",
++    pastMedical: "Similar episodic headaches for 4 years",
++    treatment: "Occasional paracetamol",
++    drug: "No known drug allergy",
++  },
++  diagnosis: "Migraine without aura",
++  investigations: [],
++  medicines: [
++    {
++      id: "demo-line-3",
++      name: "Naproxen",
++      strength: "250 mg",
++      dose: "1 tablet",
++      frequency: "As needed",
++      duration: "5 days",
++      instructions: "After food",
++    },
++  ],
++  advice: [{ id: "demo-trigger", en: "Keep a headache trigger diary.", bn: "মাথাব্যথার ট্রিগার নোট করুন।" }],
++  plan: "Review if headache pattern changes or red flags develop.",
++  notes: "Frontend demo.",
++  followUp: { date: "", note: "Review as needed" },
++};
++
++const prescriptions: PrescriptionRow[] = [
++  {
++    id: "demo-rx-1042",
++    user_id: USER_ID,
++    patient_id: "demo-patient-1",
++    serial: 1042,
++    visit_date: "2026-08-17",
++    patient_snapshot: demoDraft.patient as unknown as Json,
++    content: demoDraft as unknown as Json,
++    summary: "Hypertension — suboptimal control; Type 2 diabetes mellitus",
++    printed_at: "2026-08-17T03:35:00.000Z",
++    created_at: NOW,
++    updated_at: NOW,
++  },
++  {
++    id: "demo-rx-1041",
++    user_id: USER_ID,
++    patient_id: "demo-patient-2",
++    serial: 1041,
++    visit_date: "2026-08-10",
++    patient_snapshot: migraineDraft.patient as unknown as Json,
++    content: migraineDraft as unknown as Json,
++    summary: "Migraine without aura",
++    printed_at: null,
++    created_at: "2026-08-10T11:20:00.000Z",
++    updated_at: "2026-08-10T11:20:00.000Z",
++  },
++];
++
++const blankPatient = { patientId: null, name: "", age: "", sex: "" as const, mrn: "", weight: "", phone: "" };
++const templates: TemplateRow[] = [
++  {
++    id: "demo-template-1",
++    user_id: USER_ID,
++    name: "Hypertension follow-up",
++    description: "Routine hypertension and diabetes review",
++    content: { ...demoDraft, visitDate: "", patient: blankPatient } as unknown as Json,
++    use_count: 18,
++    created_at: "2026-07-01T09:00:00.000Z",
++    updated_at: NOW,
++  },
++  {
++    id: "demo-template-2",
++    user_id: USER_ID,
++    name: "Migraine review",
++    description: "Common migraine follow-up consultation",
++    content: { ...migraineDraft, visitDate: "", patient: blankPatient } as unknown as Json,
++    use_count: 11,
++    created_at: "2026-07-14T09:00:00.000Z",
++    updated_at: NOW,
++  },
++];
++
++const medicines: MedicineSearchRow[] = [
++  { id: "demo-med-1", name: "Amlodipine", generic: "Amlodipine", strength: "5 mg", form: "Tablet", category: "Cardiovascular", default_dose: "1 tablet", default_frequency: "Once daily", default_duration: "30 days", default_instructions: "At night", is_favorite: true, use_count: 25, is_custom: false },
++  { id: "demo-med-2", name: "Metformin", generic: "Metformin hydrochloride", strength: "500 mg", form: "Tablet", category: "Diabetes", default_dose: "1 tablet", default_frequency: "Twice daily", default_duration: "30 days", default_instructions: "After meals", is_favorite: true, use_count: 22, is_custom: false },
++  { id: "demo-med-3", name: "Naproxen", generic: "Naproxen", strength: "250 mg", form: "Tablet", category: "Analgesic", default_dose: "1 tablet", default_frequency: "Twice daily", default_duration: "5 days", default_instructions: "After food", is_favorite: false, use_count: 9, is_custom: false },
++  { id: "demo-med-4", name: "Paracetamol", generic: "Paracetamol", strength: "500 mg", form: "Tablet", category: "Analgesic", default_dose: "1–2 tablets", default_frequency: "Up to three times daily", default_duration: "3 days", default_instructions: "As needed", is_favorite: false, use_count: 16, is_custom: false },
++];
++
++type Row = Record<string, unknown>;
++type Result = { data: unknown; error: null };
++
++function relationShape(table: string, rows: Row[]): Row[] {
++  if (table === "patients") {
++    return rows.map((row) => ({
++      ...row,
++      prescriptions: [{ count: prescriptions.filter((rx) => rx.patient_id === row.id).length }],
++    }));
++  }
++  if (table === "prescriptions") {
++    return rows.map((row) => ({
++      ...row,
++      patients: patients.find((patient) => patient.id === row.patient_id)
++        ? {
++            id: patients.find((patient) => patient.id === row.patient_id)!.id,
++            name: patients.find((patient) => patient.id === row.patient_id)!.name,
++          }
++        : null,
++    }));
++  }
++  return rows;
++}
++
++function tableRows(table: string): Row[] {
++  if (table === "profiles") return [profile as unknown as Row];
++  if (table === "patients") return relationShape(table, patients as unknown as Row[]);
++  if (table === "prescriptions") return relationShape(table, prescriptions as unknown as Row[]);
++  if (table === "templates") return templates as unknown as Row[];
++  if (table === "medicines_all" || table === "medicines" || table === "medicine_catalog") {
++    return medicines as unknown as Row[];
++  }
++  return [];
++}
++
++class DemoQuery implements PromiseLike<Result> {
++  private rows: Row[];
++  private singleMode = false;
++  private mutation: "insert" | "update" | "upsert" | "delete" | null = null;
++  private mutationPayload: Row | Row[] | null = null;
++
++  constructor(private table: string) {
++    this.rows = tableRows(table);
++  }
++
++  select(_columns = "*") {
++    return this;
++  }
++
++  eq(column: string, value: unknown) {
++    this.rows = this.rows.filter((row) => row[column] === value);
++    return this;
++  }
++
++  ilike(column: string, pattern: string) {
++    const needle = pattern.replace(/^%|%$/g, "").replace(/\\([%_\\])/g, "$1").toLowerCase();
++    this.rows = this.rows.filter((row) => String(row[column] ?? "").toLowerCase().includes(needle));
++    return this;
++  }
++
++  or(expression: string) {
++    const terms = Array.from(expression.matchAll(/([a-zA-Z0-9_]+)\.ilike\.([^,]+)/g));
++    if (terms.length) {
++      this.rows = this.rows.filter((row) =>
++        terms.some(([, column, pattern]) => {
++          const needle = pattern.replace(/^%|%$/g, "").replace(/\\([%_\\])/g, "$1").toLowerCase();
++          return String(row[column] ?? "").toLowerCase().includes(needle);
++        }),
++      );
++    }
++    return this;
++  }
++
++  in(column: string, values: unknown[]) {
++    this.rows = this.rows.filter((row) => values.includes(row[column]));
++    return this;
++  }
++
++  order(column: string, options?: { ascending?: boolean }) {
++    const direction = options?.ascending === false ? -1 : 1;
++    this.rows = [...this.rows].sort((a, b) =>
++      String(a[column] ?? "").localeCompare(String(b[column] ?? "")) * direction,
++    );
++    return this;
++  }
++
++  limit(count: number) {
++    this.rows = this.rows.slice(0, count);
++    return this;
++  }
++
++  insert(payload: Row | Row[]) {
++    this.mutation = "insert";
++    this.mutationPayload = payload;
++    return this;
++  }
++
++  update(payload: Row) {
++    this.mutation = "update";
++    this.mutationPayload = payload;
++    return this;
++  }
++
++  upsert(payload: Row | Row[], _options?: unknown) {
++    this.mutation = "upsert";
++    this.mutationPayload = payload;
++    return this;
++  }
++
++  delete() {
++    this.mutation = "delete";
++    return this;
++  }
++
++  single() {
++    this.singleMode = true;
++    return this;
++  }
++
++  maybeSingle() {
++    this.singleMode = true;
++    return this;
++  }
++
++  private result(): Result {
++    if (this.mutation === "delete") return { data: null, error: null };
++
++    if (this.mutation === "insert" || this.mutation === "upsert") {
++      const payload = Array.isArray(this.mutationPayload)
++        ? (this.mutationPayload[0] ?? {})
++        : (this.mutationPayload ?? {});
++      if (this.table === "prescriptions") {
++        return { data: { ...payload, id: "demo-rx-local", serial: 1043 }, error: null };
++      }
++      if (this.table === "patients") {
++        return { data: { ...payload, id: "demo-patient-local" }, error: null };
++      }
++      if (this.table === "templates") {
++        return { data: { ...payload, id: "demo-template-local" }, error: null };
++      }
++      if (this.table === "medicines") {
++        return { data: { ...payload, id: "demo-medicine-local" }, error: null };
++      }
++      return { data: payload, error: null };
++    }
++
++    if (this.mutation === "update") {
++      const first = this.rows[0] ?? {};
++      return { data: { ...first, ...(this.mutationPayload ?? {}) }, error: null };
++    }
++
++    if (this.singleMode) return { data: this.rows[0] ?? null, error: null };
++    return { data: this.rows, error: null };
++  }
++
++  then<TResult1 = Result, TResult2 = never>(
++    onfulfilled?: ((value: Result) => TResult1 | PromiseLike<TResult1>) | null,
++    onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null,
++  ): PromiseLike<TResult1 | TResult2> {
++    return Promise.resolve(this.result()).then(onfulfilled, onrejected);
++  }
++}
++
++export function createDemoClient() {
++  return {
++    auth: {
++      async getUser() {
++        return {
++          data: {
++            user: {
++              id: USER_ID,
++              email: "demo@digitalrx.local",
++              user_metadata: { doctor_name: profile.doctor_name },
++            },
++          },
++          error: null,
++        };
++      },
++      async signInWithPassword(_credentials: { email: string; password: string }) {
++        return { data: { user: { id: USER_ID }, session: { access_token: "demo" } }, error: null };
++      },
++      async signUp(_credentials: unknown) {
++        return { data: { user: { id: USER_ID }, session: { access_token: "demo" } }, error: null };
++      },
++      async signOut() {
++        return { error: null };
++      },
++    },
++    from(table: string) {
++      return new DemoQuery(table);
++    },
++    async rpc(name: string, args?: { q?: string; lim?: number }) {
++      if (name !== "search_patients") return { data: [], error: null };
++      const needle = String(args?.q ?? "").trim().toLowerCase();
++      const limit = args?.lim ?? 25;
++      return {
++        data: patients
++          .filter((patient) =>
++            !needle || [patient.name, patient.phone, patient.mrn].some((value) => value.toLowerCase().includes(needle)),
++          )
++          .slice(0, limit),
++        error: null,
++      };
++    },
++  };
++}
++diff -ruN digital-rx-orig/digital-rx/src/lib/supabase/client.ts digital-rx-demo-clean/src/lib/supabase/client.ts
++--- digital-rx-orig/digital-rx/src/lib/supabase/client.ts	2026-08-16 17:12:07.000000000 +0000
+++++ digital-rx-demo-clean/src/lib/supabase/client.ts	2026-08-17 03:57:49.611477038 +0000
++@@ -2,12 +2,15 @@
++ 
++ import { createBrowserClient } from "@supabase/ssr";
++ import type { Database } from "@/lib/db/types";
+++import { createDemoClient, DEMO_MODE } from "@/lib/demo";
++ 
++ /**
++- * Browser Supabase client. Safe to call repeatedly — @supabase/ssr memoises
++- * the underlying client per set of credentials.
+++ * Browser Supabase client. In demo mode an in-memory compatible adapter is
+++ * returned, so the frontend can be demonstrated without a Supabase project.
++  */
++ export function createClient() {
+++  if (DEMO_MODE) return createDemoClient() as any;
+++
++   return createBrowserClient<Database>(
++     process.env.NEXT_PUBLIC_SUPABASE_URL!,
++     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
++diff -ruN digital-rx-orig/digital-rx/src/lib/supabase/middleware.ts digital-rx-demo-clean/src/lib/supabase/middleware.ts
++--- digital-rx-orig/digital-rx/src/lib/supabase/middleware.ts	2026-08-16 17:12:18.000000000 +0000
+++++ digital-rx-demo-clean/src/lib/supabase/middleware.ts	2026-08-17 03:57:50.140843953 +0000
++@@ -8,6 +8,14 @@
++  * unauthenticated traffic to /login.
++  */
++ export async function updateSession(request: NextRequest) {
+++  if (
+++    process.env.NEXT_PUBLIC_DEMO_MODE === "true" ||
+++    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+++    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+++  ) {
+++    return NextResponse.next({ request });
+++  }
+++
++   let response = NextResponse.next({ request });
++ 
++   const supabase = createServerClient(
++diff -ruN digital-rx-orig/digital-rx/src/lib/supabase/server.ts digital-rx-demo-clean/src/lib/supabase/server.ts
++--- digital-rx-orig/digital-rx/src/lib/supabase/server.ts	2026-08-16 17:12:12.000000000 +0000
+++++ digital-rx-demo-clean/src/lib/supabase/server.ts	2026-08-17 03:57:49.610251620 +0000
++@@ -1,12 +1,15 @@
++ import { createServerClient } from "@supabase/ssr";
++ import { cookies } from "next/headers";
++ import type { Database } from "@/lib/db/types";
+++import { createDemoClient, DEMO_MODE } from "@/lib/demo";
++ 
++ /**
++  * Supabase client for Server Components, Server Actions and Route Handlers.
++  * Must be awaited: cookies() is async in Next 15.
++  */
++ export async function createClient() {
+++  if (DEMO_MODE) return createDemoClient() as any;
+++
++   const cookieStore = await cookies();
++ 
++   return createServerClient<Database>(
