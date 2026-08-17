@@ -1,16 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/db/types";
 import { createDemoClient, DEMO_MODE } from "@/lib/demo";
+
+type ServerSupabaseClient = ReturnType<typeof createServerClient<Database>>;
 
 /**
  * Supabase client for Server Components, Server Actions and Route Handlers.
  * Must be awaited: cookies() is async in Next 15.
  */
-export async function createClient(): Promise<SupabaseClient<Database>> {
+export async function createClient(): Promise<ServerSupabaseClient> {
   if (DEMO_MODE) {
-    return createDemoClient() as unknown as SupabaseClient<Database>;
+    return createDemoClient() as unknown as ServerSupabaseClient;
   }
 
   const cookieStore = await cookies();
