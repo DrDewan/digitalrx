@@ -1,12 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/db/types";
+import { createDemoClient, DEMO_MODE } from "@/lib/demo";
 
 /**
  * Supabase client for Server Components, Server Actions and Route Handlers.
  * Must be awaited: cookies() is async in Next 15.
  */
 export async function createClient() {
+  if (DEMO_MODE) return createDemoClient() as any;
+
   const cookieStore = await cookies();
 
   return createServerClient<Database>(
