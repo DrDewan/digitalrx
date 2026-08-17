@@ -8,6 +8,8 @@ import { createDemoClient, DEMO_MODE } from "@/lib/demo";
  * Must be awaited: cookies() is async in Next 15.
  */
 export async function createClient() {
+  // The demo adapter intentionally implements only the Supabase surface used by this app.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (DEMO_MODE) return createDemoClient() as any;
 
   const cookieStore = await cookies();
