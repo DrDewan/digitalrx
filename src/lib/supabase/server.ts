@@ -3,22 +3,19 @@ import { cookies } from "next/headers";
 import type { Database } from "@/lib/db/types";
 import { createDemoClient, DEMO_MODE } from "@/lib/demo";
 
-type ServerSupabaseClient = ReturnType<typeof createServerClient<Database>>;
-
 /**
  * Supabase client for Server Components, Server Actions and Route Handlers.
  * Must be awaited: cookies() is async in Next 15.
  */
-export async function createClient(): Promise<ServerSupabaseClient> {
-  if (DEMO_MODE) {
-    return createDemoClient() as unknown as ServerSupabaseClient;
-  }
-
+export async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  // Build a real typed client first so TypeScript derives the exact client
+  // shape expected by the installed @supabase/ssr version. In demo mode this
+  // client is never used for network requests.
+  const realClient = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://demo.invalid",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "demo-anon-key",
     {
       cookies: {
         getAll() {
@@ -37,6 +34,12 @@ export async function createClient(): Promise<ServerSupabaseClient> {
       },
     },
   );
+
+  if (DEMO_MODE) {
+    return createDemoClient() as unknown as typeof realClient;
+  }
+
+  return realClient;
 }
 
 /** Returns the signed-in user, or null. */
