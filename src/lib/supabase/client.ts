@@ -9,6 +9,8 @@ import { createDemoClient, DEMO_MODE } from "@/lib/demo";
  * the underlying client per set of credentials.
  */
 export function createClient() {
+  // The demo adapter intentionally implements only the Supabase surface used by this app.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (DEMO_MODE) return createDemoClient() as any;
 
   return createBrowserClient<Database>(
