@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/demo-mode.patch'
+      - '.github/workflows/apply-demo-mode.yml'
 
 permissions:
   contents: write
@@ -20,9 +21,9 @@ jobs:
         shell: bash
         run: |
           awk '
-            /^@@ -0,0 +1,448 @@/ { capture=1; next }
-            /^+diff -ruN / { capture=0 }
-            capture { sub(/^+/, ""); print }
+            /^@@ -0,0 \+1,448 @@/ { capture=1; next }
+            /^\+diff -ruN / { capture=0 }
+            capture { sub(/^\+/, ""); print }
           ' .github/demo-mode.patch > src/lib/demo.ts
           test -s src/lib/demo.ts
 
