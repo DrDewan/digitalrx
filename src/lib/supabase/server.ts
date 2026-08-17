@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/db/types";
 import { createDemoClient, DEMO_MODE } from "@/lib/demo";
@@ -7,10 +8,10 @@ import { createDemoClient, DEMO_MODE } from "@/lib/demo";
  * Supabase client for Server Components, Server Actions and Route Handlers.
  * Must be awaited: cookies() is async in Next 15.
  */
-export async function createClient() {
-  // The demo adapter intentionally implements only the Supabase surface used by this app.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (DEMO_MODE) return createDemoClient() as any;
+export async function createClient(): Promise<SupabaseClient<Database>> {
+  if (DEMO_MODE) {
+    return createDemoClient() as unknown as SupabaseClient<Database>;
+  }
 
   const cookieStore = await cookies();
 
