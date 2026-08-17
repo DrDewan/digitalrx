@@ -1,0 +1,346 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design tokens
+   ========================================================================== */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-bengali: var(--font-noto-bengali), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Deep slate chrome with a teal action colour. Nothing in the interface is
+     signalled by hue alone, so it stays readable for colour-blind users and
+     under poor clinic lighting. */
+  --color-chrome-700: #1f3b5c;
+  --color-chrome-800: #16263c;
+  --color-chrome-900: #0e1a2b;
+
+  --color-brand-50: #eefbf7;
+  --color-brand-100: #d3f4ea;
+  --color-brand-200: #a8e8d6;
+  --color-brand-300: #6fd5bd;
+  --color-brand-400: #3bbba1;
+  --color-brand-500: #1a9f88;
+  --color-brand-600: #0f7f6d;
+  --color-brand-700: #0d6659;
+  --color-brand-800: #0e5148;
+  --color-brand-900: #0d443d;
+
+  --radius-panel: 0.625rem;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-slate-100 text-slate-900 antialiased;
+    font-family: var(--font-sans);
+  }
+
+  /* Bangla needs its own face and a taller line box. */
+  body.lang-bn,
+  .bn-text {
+    font-family: var(--font-bengali);
+    line-height: 1.7;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+
+  /* Dense by design: this is a form filled between patients. */
+  input[type="text"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="password"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  select,
+  textarea {
+    @apply w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-slate-900
+           transition placeholder:text-slate-400
+           focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none
+           disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500;
+  }
+
+  textarea {
+    @apply resize-y leading-relaxed;
+  }
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+@layer components {
+  .panel {
+    @apply rounded-[0.625rem] border border-slate-200 bg-white;
+  }
+
+  .panel-header {
+    @apply flex items-center justify-between gap-3 border-b border-slate-200 px-3.5 py-2.5;
+  }
+
+  .panel-title {
+    @apply text-sm font-semibold tracking-tight text-slate-800;
+  }
+
+  .panel-body {
+    @apply space-y-3 p-3.5;
+  }
+
+  .field-label {
+    @apply mb-1 block text-xs font-medium tracking-wide text-slate-600 uppercase;
+  }
+
+  .hint {
+    @apply text-xs leading-relaxed text-slate-500;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm
+           font-medium whitespace-nowrap transition select-none
+           disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md bg-brand-600 px-3 py-1.5
+           text-sm font-medium whitespace-nowrap text-white transition select-none
+           hover:bg-brand-700 active:bg-brand-800
+           disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-slate-300
+           bg-white px-3 py-1.5 text-sm font-medium whitespace-nowrap text-slate-700 transition
+           select-none hover:bg-slate-50 active:bg-slate-100
+           disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm
+           font-medium whitespace-nowrap text-slate-600 transition select-none
+           hover:bg-slate-100 hover:text-slate-900
+           disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md border border-rose-200
+           bg-white px-3 py-1.5 text-sm font-medium whitespace-nowrap text-rose-700 transition
+           select-none hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-sm {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white px-2.5 py-1
+           text-xs font-medium text-slate-700 transition hover:border-brand-400 hover:bg-brand-50;
+  }
+
+  .chip-active {
+    @apply border-brand-500 bg-brand-50 text-brand-800;
+  }
+
+  /* A tick target comfortable to hit quickly with a mouse. */
+  .tick {
+    @apply flex cursor-pointer items-start gap-2 rounded-md border border-transparent px-2 py-1.5
+           text-sm text-slate-700 transition hover:bg-slate-50;
+  }
+
+  .tick-on {
+    @apply border-brand-200 bg-brand-50 text-slate-900;
+  }
+
+  .tick input[type="checkbox"] {
+    @apply mt-0.5 size-4 shrink-0 cursor-pointer rounded border-slate-400;
+    accent-color: var(--color-brand-600);
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold tracking-wide;
+  }
+
+  .scroll-list {
+    @apply max-h-72 overflow-y-auto overscroll-contain rounded-md border border-slate-200 bg-white p-1;
+  }
+
+  .rx-preview-scroller {
+    @apply overflow-auto rounded-lg border border-slate-200 bg-slate-200 p-4;
+  }
+}
+
+/* The sheet is always in the document — the layout engine has to be able to
+   measure it — but it sits far off-screen until the doctor opens the preview.
+   Print rules below pull it back to the page origin. */
+.rx-offscreen {
+  position: fixed;
+  left: -20000px;
+  top: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Hospital pad overlay
+   --------------------------------------------------------------------------
+   These millimetre values land on a pre-printed pad. Geometry is supplied per
+   profile as inline styles; this block fixes only typography and page
+   mechanics, and must not drift.
+   ========================================================================== */
+.rx-page {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  background: #fff;
+  page-break-after: always;
+  break-after: page;
+}
+
+.rx-page:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+
+.rx-box {
+  position: absolute;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+  /* Arial deliberately: metrically identical on every machine that will print
+     this, so a pad calibrated once stays calibrated. */
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.4;
+  color: #000;
+  font-size: 11pt;
+}
+
+.rx-measure {
+  position: absolute;
+  left: -100000px;
+  top: -100000px;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.4;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+  pointer-events: none;
+}
+
+/* Alignment guides — screen only. */
+.rx-guide {
+  position: absolute;
+  background: rgba(15, 127, 109, 0.4);
+  pointer-events: none;
+}
+
+.rx-guide-v {
+  left: 105mm;
+  top: 0;
+  width: 0.4mm;
+  height: 297mm;
+}
+
+.rx-guide-h {
+  left: 0;
+  top: 85mm;
+  height: 0.4mm;
+  width: 210mm;
+}
+
+.overlay-debug .rx-box {
+  outline: 0.35mm dashed rgba(15, 127, 109, 0.6);
+}
+
+/* The calibration sheet is the one case where the box edges must reach paper. */
+.overlay-debug-print .rx-box {
+  outline: 0.3mm dashed #555;
+}
+
+.rx-preview-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transform-origin: top left;
+}
+
+.rx-preview-stack .rx-page {
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.18);
+  outline: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  /* Print the overlay sheet and nothing else, whatever is on screen. */
+  body * {
+    visibility: hidden !important;
+  }
+
+  #print-root,
+  #print-root * {
+    visibility: visible !important;
+  }
+
+  #print-root,
+  #print-root.rx-offscreen {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0;
+    padding: 0;
+    pointer-events: auto;
+  }
+
+  #print-root .rx-preview-scroller {
+    all: unset;
+    display: block;
+  }
+
+  #print-root .rx-preview-frame {
+    height: auto !important;
+  }
+
+  #print-root .rx-preview-stack {
+    display: block;
+    transform: none !important;
+    gap: 0;
+  }
+
+  #print-root .rx-page {
+    box-shadow: none !important;
+    outline: none !important;
+    margin: 0;
+  }
+
+  .rx-guide {
+    display: none !important;
+  }
+
+  .overlay-debug .rx-box {
+    outline: none !important;
+  }
+
+  .overlay-debug-print .rx-box {
+    outline: 0.3mm dashed #555 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
